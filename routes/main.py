@@ -24,7 +24,36 @@ def gradingByDay():
     result = {}
     result["total_sum"] = {}
     df = df.replace({np.nan: None})
-    result["df"] = df.to_dict()
+    result["df"] = df.to_dict(orient="records")
+    for i in utils.list_yard:
+        result["total_sum"][i] = df[i].sum()
+    return jsonify(
+        {
+            "message": "Hello, World! This is a simple Flask app using Blueprints.",
+            "status": "success",
+            "data": result,
+        }
+    )
+
+
+@main_bp.route("/gradingByWeek", methods=["GET"])
+def gradingByWeek():
+    option = request.args.get("option")
+    week = request.args.get("week")
+    df = []
+
+    for data in init.data:
+        if data["name"] == option:
+            df = data["data"]
+
+    if week is None:
+        week = df["TANGGAL"].max()
+
+    df = df[df["TANGGAL"] == week]
+    result = {}
+    result["total_sum"] = {}
+    df = df.replace({np.nan: None})
+    result["df"] = df.to_dict(orient="records")
     for i in utils.list_yard:
         result["total_sum"][i] = df[i].sum()
     return jsonify(
